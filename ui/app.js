@@ -728,7 +728,7 @@ function profileForm(p) {
       <small id="loader-hint"></small>
     </div>
     <div class="grid2" style="margin-top:20px">
-      <label class="field"><span>${t("Versione di Minecraft")}</span><select class="input" name="mc" id="mc-select"><option>${t("Caricamento…")}</option></select></label>
+      <label class="field"><span>${t("Versione di Minecraft")}</span><select class="input" name="mc" id="mc-select"><option value="">${t("Caricamento…")}</option></select></label>
       <label class="field" id="of-field" hidden><span>${t("Build di OptiFine")}</span><select class="input" id="of-select"></select></label>
       <label class="field"><span>${t("Nome")}</span><input class="input" name="name" maxlength="48" value="${esc(v.name)}" placeholder="${esc(tp("Es. Sopravvivenza con gli amici"))}"></label>
     </div>
@@ -809,7 +809,9 @@ async function bindProfileForm(p) {
   function syncVersions() {
     form.querySelectorAll("[data-loader]").forEach((b) => b.setAttribute("aria-pressed", b.dataset.loader === loader));
     const list = versionsFor(loader);
-    const prev = mcSel.value || (p ? p.mc : "");
+    // First fill: the profile's own version (the select still holds the loading placeholder).
+    const prev = mcSel.dataset.filled ? mcSel.value : p ? p.mc : "";
+    mcSel.dataset.filled = "1";
     mcSel.innerHTML = list.map((v) => {
       const pre = loader === "optifine" && S.optifine[v.id]?.every((b) => b.preview);
       return `<option value="${esc(v.id)}">${esc(v.id)}${v.kind === "snapshot" ? " (snapshot)" : ""}${pre ? ` · ${t("solo anteprima")}` : ""}</option>`;
@@ -1219,7 +1221,7 @@ listen("game-exit", async ({ payload: e }) => {
   renderRail();
   paintProgress(e.profile);
   if (e.error) toast(e.error, "bad");
-  if (!e.stopped && e.code && e.code !== 0) toast(e.reason ? tp("Il gioco si è chiuso: {reason}", { reason: e.reason }) : tp("Il gioco si è chiuso con un errore (codice {code}). Guarda il Log.", { code: e.code }), "bad");
+  if (!e.stopped && e.code && e.code !== 0) toast(e.reason ? tp("Il gioco si è chiuso: {reason}", { reason: tp(e.reason.key, e.reason.vars) }) : tp("Il gioco si è chiuso con un errore (codice {code}). Guarda il Log.", { code: e.code }), "bad");
   const p = profile(e.profile);
   if (p && current()?.id === p.id && ["worlds", "shots"].includes(S.view.tab)) renderTab(p);
 });

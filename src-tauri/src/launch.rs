@@ -44,31 +44,56 @@ struct ExitEvent {
     stopped: bool,
     error: Option<String>,
     /// Best guess at why the game crashed, read from its log.
-    reason: Option<String>,
+    reason: Option<Reason>,
 }
 
 /// Fabric explains dependency problems in plain words; otherwise use the last exception.
-fn crash_reason(lines: &[String]) -> Option<String> {
+/// Why the game crashed, as an i18n key (Italian source text, translated by the UI) and its values.
+#[derive(Serialize, Clone, Debug)]
+pub struct Reason {
+    key: &'static str,
+    vars: std::collections::BTreeMap<&'static str, String>,
+}
+
+fn reason(key: &'static str, vars: &[(&'static str, String)]) -> Option<Reason> {
+    Some(Reason { key, vars: vars.iter().cloned().collect() })
+}
+
+fn crash_reason(lines: &[String]) -> Option<Reason> {
     if let Some(i) = lines.iter().position(|l| l.contains("Incompatible mods found") || l.contains("Mod resolution failed")) {
-        let details: Vec<&str> = lines[i..]
+        let rest = &lines[i..];
+        // The most common case by far: mods made for another Minecraft version.
+        let wrong_mc = rest.iter().filter(|l| l.contains("of 'Minecraft' (minecraft), but only the wrong version is present")).count();
+        if wrong_mc > 0 {
+            let re = regex::Regex::new(r"Replace 'Minecraft' \(minecraft\) (\S+) with version (\S+?)\.?$").unwrap();
+            let have = rest.iter().find_map(|l| l.trim().strip_prefix("- ").and_then(|l| re.captures(l)));
+            return match have {
+                Some(c) => reason(
+                    "{n} mod sono per Minecraft {need}, non per la {have}. Cambia versione nella scheda Profilo.",
+                    &[("n", wrong_mc.to_string()), ("need", c[2].to_string()), ("have", c[1].to_string())],
+                ),
+                None => reason("{n} mod non sono per questa versione di Minecraft. Aggiornale o rimuovile.", &[("n", wrong_mc.to_string())]),
+            };
+        }
+        // Otherwise Fabric's first suggestion (never the launcher's own cape mod, which only follows the profile).
+        let first = rest
             .iter()
             .map(|l| l.trim())
-            .filter(|l| l.starts_with("- "))
-            .take(3)
-            .collect();
-        if !details.is_empty() {
-            return Some(format!("Incompatible mods: {}", details.join(" ").trim_start_matches("- ")));
-        }
-        return Some("Some mods are incompatible with each other or with this version.".into());
+            .filter_map(|l| l.strip_prefix("- "))
+            .find(|l| !l.contains("(blocco-cape)"));
+        return match first {
+            Some(d) => reason("Mod incompatibili: {detail}", &[("detail", d.chars().take(200).collect())]),
+            None => reason("Alcune mod non sono compatibili tra loro o con questa versione.", &[]),
+        };
     }
     if lines.iter().any(|l| l.contains("UnsupportedClassVersionError")) {
-        return Some("The Java version is not suitable for this game version.".into());
+        return reason("La versione di Java non è adatta a questa versione del gioco.", &[]);
     }
     lines
         .iter()
         .rev()
         .find(|l| l.contains("Exception:") || l.contains("Error:"))
-        .map(|l| l.trim().chars().take(240).collect())
+        .and_then(|l| reason("{detail}", &[("detail", l.trim().chars().take(200).collect())]))
 }
 
 /// Mojang's log4j config prints events as XML for launchers; turn them back into
@@ -466,6 +491,24 @@ mod tests {
         .map(|s| s.to_string())
         .collect();
         let r = super::crash_reason(&log).unwrap();
-        assert!(r.contains("Replace mod 'Sodium'"), "{r}");
+        assert!(r.vars["detail"].contains("Replace mod 'Sodium'"), "{r:?}");
+    }
+
+    #[test]
+    fn mods_for_another_version_are_counted() {
+        let log: Vec<String> = [
+            "Incompatible mods found!",
+            "A potential solution has been determined, this may resolve your problem:",
+            "\t - Remove mod 'Blocco Cape' (blocco-cape) 1.0.0 (C:\\x\\blocco-cape.jar).",
+            "\t - Replace 'Minecraft' (minecraft) 26.3 with version 1.21.1.",
+            "More details:",
+            "\t - Mod 'Sodium' (sodium) 0.8.12 requires version 1.21.1 of 'Minecraft' (minecraft), but only the wrong version is present: 26.3!",
+            "\t - Mod 'Iris' (iris) 1.8 requires version 1.21.1 of 'Minecraft' (minecraft), but only the wrong version is present: 26.3!",
+        ]
+        .iter()
+        .map(|s| s.to_string())
+        .collect();
+        let r = super::crash_reason(&log).unwrap();
+        assert_eq!((r.vars["n"].as_str(), r.vars["need"].as_str(), r.vars["have"].as_str()), ("2", "1.21.1", "26.3"), "{r:?}");
     }
 }

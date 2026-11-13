@@ -359,6 +359,8 @@ select.input option { background: var(--raised); }
 .toast { background: var(--high); border: 1px solid var(--seam-strong); border-radius: var(--r); padding: 11px 14px; box-shadow: var(--shadow); display: flex; gap: 10px; align-items: flex-start; animation: toast-in 220ms var(--ease); user-select: text; }
 .toast svg { margin-top: 1px; color: var(--grass); }
 .toast.bad svg { color: var(--bad); }
+.toast > div { min-width: 0; overflow-wrap: anywhere; }
+.toast svg { flex: none; }
 @keyframes toast-in { from { transform: translateY(8px); opacity: 0; } }
 .spin { animation: spin .9s linear infinite; }
 @keyframes spin { to { transform: rotate(360deg); } }
