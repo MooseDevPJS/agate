@@ -1,0 +1,12 @@
+# Build output and local toolchains
+/src-tauri/target/
+/src-tauri/gen/
+/.tools/
+/cape-mod/build/
+
+# Review screenshots (they show the local account and worlds)
+/.impeccable/review/
+
+# Never commit signing keys
+*.key
+/.impeccable/questions/
