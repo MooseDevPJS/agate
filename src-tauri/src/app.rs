@@ -84,9 +84,10 @@ impl Reporter {
         let label = label.to_string();
         Arc::new(move |d, t, b, tb| me.progress(&label, d, t, b, tb))
     }
-    pub fn log(&self, line: &str) {
+    /// Game output, sent in batches: one event per line froze the UI when a mod logged thousands of lines.
+    pub fn log(&self, lines: &[String]) {
         #[derive(Serialize, Clone)]
-        struct LogEvent<'a> { profile: &'a str, line: &'a str }
-        let _ = self.app.emit("log", LogEvent { profile: &self.profile, line });
+        struct LogEvent<'a> { profile: &'a str, lines: &'a [String] }
+        let _ = self.app.emit("log", LogEvent { profile: &self.profile, lines });
     }
 }

@@ -1225,16 +1225,21 @@ listen("game-exit", async ({ payload: e }) => {
   const p = profile(e.profile);
   if (p && current()?.id === p.id && ["worlds", "shots"].includes(S.view.tab)) renderTab(p);
 });
-listen("log", ({ payload: { profile: id, line } }) => {
-  (S.logs[id] ||= []).push(line);
-  if (current()?.id === id && S.view.tab === "logs") {
-    const el = $("#log");
-    if (!el) return;
-    if (S.logs[id].length === 1) el.innerHTML = "";
-    const stick = el.scrollHeight - el.scrollTop - el.clientHeight < 40;
-    el.insertAdjacentHTML("beforeend", logLine(line));
-    if (stick) el.scrollTop = el.scrollHeight;
-  }
+const LOG_LINES = 3000; // same window as the launcher keeps
+listen("log", ({ payload: { profile: id, lines } }) => {
+  const log = (S.logs[id] ||= []);
+  const fresh = !log.length;
+  log.push(...lines);
+  const over = log.length - LOG_LINES;
+  if (over > 0) log.splice(0, over);
+  if (current()?.id !== id || S.view.tab !== "logs") return;
+  const el = $("#log");
+  if (!el) return;
+  const stick = el.scrollHeight - el.scrollTop - el.clientHeight < 40;
+  // One DOM write per batch; past the window, redraw the window instead of growing forever.
+  if (fresh || over > 0) el.innerHTML = log.map(logLine).join("");
+  else el.insertAdjacentHTML("beforeend", lines.map(logLine).join(""));
+  if (stick) el.scrollTop = el.scrollHeight;
 });
 
 /* ---------------- keyboard ---------------- */

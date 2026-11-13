@@ -14,6 +14,8 @@ use tauri::{Emitter, Manager};
 use tokio::io::{AsyncBufReadExt, BufReader};
 
 const LOG_LINES: usize = 3000;
+/// How often game output is forwarded to the UI.
+const LOG_FLUSH: std::time::Duration = std::time::Duration::from_millis(250);
 
 #[derive(Default)]
 pub struct Runtime {
@@ -394,12 +396,33 @@ async fn play_inner(app: tauri::AppHandle, paths: Paths, rt: &'static Runtime, p
         tokio::spawn(async move {
             let mut lines = BufReader::new(stream).lines();
             let mut xml = XmlLog::default();
-            while let Ok(Some(raw)) = lines.next_line().await {
-                for line in xml.feed(&raw) {
-                    // Never surface the access token in logs.
-                    let line = if !token.is_empty() && line.contains(&token) { line.replace(&token, "<token>") } else { line };
-                    rt.push_log(&pid_s, &line);
-                    rep.log(&line);
+            let mut batch: Vec<String> = Vec::new();
+            let mut last = std::time::Instant::now();
+            loop {
+                // `next_line` is cancel safe, so a timeout only means "nothing new yet".
+                let next = tokio::time::timeout(LOG_FLUSH, lines.next_line()).await;
+                let open = match next {
+                    Ok(Ok(Some(raw))) => {
+                        for line in xml.feed(&raw) {
+                            // Never surface the access token in logs.
+                            let line = if !token.is_empty() && line.contains(&token) { line.replace(&token, "<token>") } else { line };
+                            rt.push_log(&pid_s, &line);
+                            batch.push(line);
+                        }
+                        true
+                    }
+                    Ok(_) => false, // end of output or read error
+                    Err(_) => true,
+                };
+                if !batch.is_empty() && (!open || last.elapsed() >= LOG_FLUSH) {
+                    // The UI keeps the same window as the runtime: older lines are never shown anyway.
+                    let skip = batch.len().saturating_sub(LOG_LINES);
+                    rep.log(&batch[skip..]);
+                    batch.clear();
+                    last = std::time::Instant::now();
+                }
+                if !open {
+                    break;
                 }
             }
         });
