@@ -1,5 +1,5 @@
 ---
-name: Blocco
+name: Agate
 description: A light Minecraft launcher that opens on the title screen of the version you're about to play.
 colors:
   bg: "#141311"
@@ -120,7 +120,7 @@ components:
     rounded: "{rounded.xs}"
 ---
 
-# Blocco design system
+# Agate design system
 
 ## Overview
 
@@ -161,12 +161,13 @@ Flat with tonal layering. Real depth only in the game art: CSS 3D panorama cube,
 - **Cape editor**: inline in the card, never a modal. While editing, the figure turns its back (165°) and shows the cape live; controls: Riempi/Adatta, Bordi colour (default: the picture's average colour), Cambia immagine, Salva/Annulla. A 2:1 picture is treated as a ready-made template and used as it is.
 - **Floating scrollbar** for the page: drawn over the content (6px, 9px on hover), it never takes up width, so switching tabs never resizes the hero.
 - **Worlds and servers**: two sections in the same tab; a server card shows its saved icon, name, address and "Entra".
-- **Update chip**: when a new version exists, a small pill (green dot + "Aggiorna") sits in the titlebar beside the window buttons, on the same dark overlay as the hero controls; it never appears while checking or on errors. One click installs (no dialog: nothing is lost) and the chip turns into the download percentage. The same state lives in Settings → Preferenze, last row "Blocco <version>", with "Controlla aggiornamenti".
+- **Update chip**: when a new version exists, a small pill (green dot + "Aggiorna") sits in the titlebar beside the window buttons, on the same dark overlay as the hero controls; it never appears while checking or on errors. One click installs (no dialog: nothing is lost) and the chip turns into the download percentage. The same state lives in Settings → Preferenze, last row "Agate <version>", with "Controlla aggiornamenti".
 - Segmented control, toggle, colour swatch with cube, native `<dialog>` only for destructive actions, toasts at bottom right.
 
 ## Logo and icons
 
-- **Logo** (`ui/icons.js`, `Art.logo`): "Blocco", a little isometric grass block with a face (two eyes with a highlight, a small smile) and grass that drips down the sides. Pure vector, viewBox 64: the same drawing serves for the rail (30px, blinks every ~5s and hops on hover) and the app icon (badge on obsidian `#141311` with radius 15, `src-tauri/icons/icon.ico` at 16–256px and `icon.png` 512px, rendered from the same SVG).
+- **Logo**: the Agate mark, a geometric A whose right leg is cut by a slanted gap, with an isometric block standing under the arch. Masters in `brand/`: `agate.svg` (white mark on a black rounded square, radius ≈ 23%, the app icon) and `agate-mark.svg` (mark alone, `currentColor`, viewBox 760×552). Exact geometry: every leg edge has the same slope, the block is isometric and centred on the A's axis. In the rail (`Art.logo`) the mark is drawn alone in `--ink` at 29px wide, with no badge (a black square on the dark rail would disappear); on hover the block rises slightly under the arch (no motion when animations are reduced). `src-tauri/icons/icon.ico` (16–256px) and `icon.png` (512px) are rendered from the same geometry; `brand/agate-1024.png` for anything else.
+- **Never**: recolour the mark with a chapter colour, add effects (glow, gradients), or put it back on a grass block. White on black, or ink on the obsidian surfaces.
 - **Profile icons** (`Art.icon`): 10 designs in 16×16 pixel art (Blocco, Erba, Gemma, Piccone, Spada, Albero, Pozione, Cuore, Casa, Fiamma) with `shape-rendering: crispEdges`. Palette: outline `#19140f`, highlight `#fff6e0`, fixed materials (wood, earth, stone, glass) and three tones of the profile colour (`--p1` light, `--p2` base, `--p3` dark): every icon works with all 5 colours. The colour swatches show the chosen icon.
 
 ## Copy and help

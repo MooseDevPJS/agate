@@ -516,7 +516,7 @@ fn system_memory_mb() -> u64 {
     8192
 }
 
-/// `blocco://` (http://blocco.localhost on Windows): images from the data folder only
+/// `agate://` (http://agate.localhost on Windows): images from the data folder only
 /// (title-screen panorama, skins, world icons, screenshots).
 fn serve_data_file(uri_path: &str) -> tauri::http::Response<Vec<u8>> {
     let respond = |status: u16, ct: &str, body: Vec<u8>| {
@@ -563,7 +563,7 @@ async fn update_check(app: tauri::AppHandle) -> Res<Option<update::Available>> {
 
 #[tauri::command]
 async fn update_install(app: tauri::AppHandle) -> Res<()> {
-    // The installer closes Blocco: a running game would lose its settings sync on exit.
+    // The installer closes Agate: a running game would lose its settings sync on exit.
     let rt = runtime();
     if !rt.running.lock().unwrap().is_empty() || !rt.busy.lock().unwrap().is_empty() {
         return Err("Close the game before updating".into());
@@ -580,7 +580,7 @@ fn main() {
             app.manage(paths);
             Ok(())
         })
-        .register_uri_scheme_protocol("blocco", |_ctx, req| serve_data_file(req.uri().path()))
+        .register_uri_scheme_protocol("agate", |_ctx, req| serve_data_file(req.uri().path()))
         .invoke_handler(tauri::generate_handler![
             snapshot, versions, fabric_versions, optifine_builds, save_profile, delete_profile, play, stop, logs,
             open_folder, open_url, content_search, content_install, content_list, content_remove, content_toggle, worlds,
@@ -588,5 +588,5 @@ fn main() {
             add_offline, set_account, remove_account, save_settings, system_memory_mb, update_check, update_install
         ])
         .run(tauri::generate_context!())
-        .expect("error while running Blocco");
+        .expect("error while running Agate");
 }

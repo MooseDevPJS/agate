@@ -1,8 +1,8 @@
 {
   "$schema": "https://schema.tauri.app/config/2",
-  "productName": "Blocco",
-  "version": "0.1.2",
-  "identifier": "app.blocco.launcher",
+  "productName": "Agate",
+  "version": "0.2.0",
+  "identifier": "app.agate.launcher",
   "build": {
     "frontendDist": "../ui"
   },
@@ -10,7 +10,7 @@
     "withGlobalTauri": true,
     "windows": [
       {
-        "title": "Blocco",
+        "title": "Agate",
         "width": 1180,
         "height": 740,
         "minWidth": 900,
@@ -22,7 +22,7 @@
       }
     ],
     "security": {
-      "csp": "default-src 'self'; img-src 'self' https: data: blocco: http://blocco.localhost; style-src 'self' 'unsafe-inline'; font-src 'self'; connect-src ipc: http://ipc.localhost"
+      "csp": "default-src 'self'; img-src 'self' https: data: agate: http://agate.localhost; style-src 'self' 'unsafe-inline'; font-src 'self'; connect-src ipc: http://ipc.localhost"
     }
   },
   "bundle": {
@@ -34,9 +34,9 @@
       "icons/icon.ico",
       "icons/icon.png"
     ],
-    "publisher": "Blocco",
+    "publisher": "Agate",
     "shortDescription": "Launcher leggero per Minecraft",
-    "longDescription": "Blocco: profili, mod, texture pack, shader, OptiFine e mantelli personalizzati per Minecraft Java.",
+    "longDescription": "Agate: profili, mod, texture pack, shader, OptiFine e mantelli personalizzati per Minecraft Java.",
     "category": "Game",
     "windows": {
       "nsis": {
@@ -46,7 +46,8 @@
           "English"
         ],
         "displayLanguageSelector": false,
-        "installerIcon": "icons/icon.ico"
+        "installerIcon": "icons/icon.ico",
+        "installerHooks": "windows/hooks.nsh"
       }
     },
     "createUpdaterArtifacts": true
@@ -55,7 +56,7 @@
     "updater": {
       "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IEVCQUYwQjVFQTMxNTk1MEYKUldRUGxSV2pYZ3V2NndRV082R3piR1poVmoyLzFmcHFaZEdPb0hyUko4STY2N05DVlF5WWhrR3UK",
       "endpoints": [
-        "https://github.com/MooseDevPJS/blocco/releases/latest/download/latest.json"
+        "https://github.com/MooseDevPJS/agate/releases/latest/download/latest.json"
       ],
       "windows": {
         "installMode": "passive"

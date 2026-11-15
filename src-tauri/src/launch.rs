@@ -82,7 +82,7 @@ fn crash_reason(lines: &[String]) -> Option<Reason> {
             .iter()
             .map(|l| l.trim())
             .filter_map(|l| l.strip_prefix("- "))
-            .find(|l| !l.contains("(blocco-cape)"));
+            .find(|l| !l.contains("(agate-cape)"));
         return match first {
             Some(d) => reason("Mod incompatibili: {detail}", &[("detail", d.chars().take(200).collect())]),
             None => reason("Alcune mod non sono compatibili tra loro o con questa versione.", &[]),
@@ -259,7 +259,7 @@ fn build_args(
         ("user_properties", "{}".into()),
         ("version_type", v.json.kind.clone().unwrap_or_else(|| "release".into())),
         ("natives_directory", natives.display().to_string()),
-        ("launcher_name", "Blocco".into()),
+        ("launcher_name", "Agate".into()),
         ("launcher_version", env!("CARGO_PKG_VERSION").into()),
         ("classpath", classpath),
         ("classpath_separator", sep.into()),
@@ -522,7 +522,7 @@ mod tests {
         let log: Vec<String> = [
             "Incompatible mods found!",
             "A potential solution has been determined, this may resolve your problem:",
-            "\t - Remove mod 'Blocco Cape' (blocco-cape) 1.0.0 (C:\\x\\blocco-cape.jar).",
+            "\t - Remove mod 'Agate Cape' (agate-cape) 1.0.0 (C:\\x\\agate-cape.jar).",
             "\t - Replace 'Minecraft' (minecraft) 26.3 with version 1.21.1.",
             "More details:",
             "\t - Mod 'Sodium' (sodium) 0.8.12 requires version 1.21.1 of 'Minecraft' (minecraft), but only the wrong version is present: 26.3!",

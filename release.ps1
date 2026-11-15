@@ -1,4 +1,4 @@
-# Builds a signed Blocco installer and the latest.json the in-app updater reads.
+# Builds a signed Agate installer and the latest.json the in-app updater reads.
 #
 #   .\release.ps1                  build only (files in src-tauri\target\release\bundle\nsis)
 #   .\release.ps1 -Publish         build and create the GitHub release v<version> with gh
@@ -8,8 +8,8 @@
 # The private key stays outside the repository; without it the update cannot be signed.
 param(
     [string]$Notes = "",
-    [string]$Key = "$env:USERPROFILE\.tauri\blocco-updater.key",
-    [string]$Repo = "MooseDevPJS/blocco",
+    [string]$Key = "$env:USERPROFILE\.tauri\agate-updater.key",
+    [string]$Repo = "MooseDevPJS/agate",
     [switch]$Publish
 )
 $ErrorActionPreference = "Stop"
@@ -31,7 +31,7 @@ $ErrorActionPreference = "Stop"
 if ($built -ne 0) { throw "Build failed" }
 
 $dir = "src-tauri\target\release\bundle\nsis"
-$setup = "Blocco_${version}_x64-setup.exe"
+$setup = "Agate_${version}_x64-setup.exe"
 $sig = (Get-Content "$dir\$setup.sig" -Raw).Trim()
 $latest = [ordered]@{
     version   = $version
@@ -49,7 +49,7 @@ $json = $latest | ConvertTo-Json -Depth 5
 Write-Host "Built $setup and latest.json in $dir"
 
 if ($Publish) {
-    $title = "Blocco $version"
+    $title = "Agate $version"
     if ($Notes) { gh release create $tag "$dir\$setup" "$dir\latest.json" --repo $Repo --title $title --notes $Notes }
     else { gh release create $tag "$dir\$setup" "$dir\latest.json" --repo $Repo --title $title --generate-notes }
     if ($LASTEXITCODE -ne 0) { throw "gh release failed" }

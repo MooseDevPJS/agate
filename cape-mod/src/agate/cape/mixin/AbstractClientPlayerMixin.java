@@ -1,6 +1,6 @@
-package blocco.cape.mixin;
+package agate.cape.mixin;
 
-import blocco.cape.BloccoCape;
+import agate.cape.AgateCape;
 import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraft.core.ClientAsset;
 import net.minecraft.world.entity.player.PlayerSkin;
@@ -13,12 +13,12 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 @Mixin(AbstractClientPlayer.class)
 public abstract class AbstractClientPlayerMixin {
     @Inject(method = "getSkin", at = @At("RETURN"), cancellable = true)
-    private void blocco$customCape(CallbackInfoReturnable<PlayerSkin> cir) {
+    private void agate$customCape(CallbackInfoReturnable<PlayerSkin> cir) {
         PlayerSkin skin = cir.getReturnValue();
         if (skin == null) {
             return;
         }
-        ClientAsset.Texture cape = BloccoCape.forPlayer(((AbstractClientPlayer) (Object) this).getUUID());
+        ClientAsset.Texture cape = AgateCape.forPlayer(((AbstractClientPlayer) (Object) this).getUUID());
         if (cape != null) {
             cir.setReturnValue(new PlayerSkin(skin.body(), cape, cape, skin.model(), skin.secure()));
         }

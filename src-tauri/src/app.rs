@@ -13,8 +13,8 @@ pub struct Paths {
 
 impl Paths {
     pub fn new() -> Self {
-        let root = dirs::data_dir().unwrap_or_else(|| PathBuf::from(".")).join("Blocco");
-        Self { root }
+        let base = dirs::data_dir().unwrap_or_else(|| PathBuf::from("."));
+        Self { root: data_root(&base) }
     }
     pub fn versions(&self) -> PathBuf { self.root.join("versions") }
     pub fn version_dir(&self, id: &str) -> PathBuf { self.versions().join(id) }
@@ -29,6 +29,24 @@ impl Paths {
     pub fn shared(&self) -> PathBuf { self.root.join("shared") }
     pub fn cache(&self) -> PathBuf { self.root.join("cache") }
     pub fn file(&self, name: &str) -> PathBuf { self.root.join(name) }
+}
+
+/// The data folder, `%APPDATA%\Agate`. Agate was called Blocco before 0.2.0: on the first
+/// start its `%APPDATA%\Blocco` is renamed in place (instant, nothing is copied), so profiles,
+/// worlds, accounts and settings carry over. If the rename is not possible yet (a file is still
+/// open, e.g. by a game the old app started), the old folder keeps being used and the rename is
+/// tried again at the next start: data is never split between the two.
+pub fn data_root(base: &Path) -> PathBuf {
+    let root = base.join("Agate");
+    let old = base.join("Blocco");
+    let ours = old.join("profiles.json").is_file() || old.join("instances").is_dir();
+    if root.exists() || !ours {
+        return root;
+    }
+    match std::fs::rename(&old, &root) {
+        Ok(()) => root,
+        Err(_) => old,
+    }
 }
 
 pub fn read_json<T: DeserializeOwned + Default>(path: &Path) -> T {
@@ -89,5 +107,62 @@ impl Reporter {
         #[derive(Serialize, Clone)]
         struct LogEvent<'a> { profile: &'a str, lines: &'a [String] }
         let _ = self.app.emit("log", LogEvent { profile: &self.profile, lines });
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::data_root;
+    use std::path::PathBuf;
+
+    fn base(name: &str) -> PathBuf {
+        let b = std::env::temp_dir().join(format!("agate-root-{name}-{}", std::process::id()));
+        let _ = std::fs::remove_dir_all(&b);
+        std::fs::create_dir_all(&b).unwrap();
+        b
+    }
+
+    #[test]
+    fn blocco_data_moves_to_agate() {
+        let b = base("move");
+        std::fs::create_dir_all(b.join("Blocco/instances/abc/saves/World")).unwrap();
+        std::fs::write(b.join("Blocco/accounts.json"), "{}").unwrap();
+        assert_eq!(data_root(&b), b.join("Agate"));
+        assert!(b.join("Agate/instances/abc/saves/World").is_dir());
+        assert!(b.join("Agate/accounts.json").is_file());
+        assert!(!b.join("Blocco").exists());
+        // Second start: nothing left to move.
+        assert_eq!(data_root(&b), b.join("Agate"));
+        let _ = std::fs::remove_dir_all(b);
+    }
+
+    #[test]
+    fn existing_agate_wins_and_unrelated_folders_stay() {
+        let b = base("keep");
+        std::fs::create_dir_all(b.join("Agate")).unwrap();
+        std::fs::create_dir_all(b.join("Blocco/instances")).unwrap();
+        assert_eq!(data_root(&b), b.join("Agate"));
+        assert!(b.join("Blocco/instances").is_dir());
+        // A "Blocco" folder that is not ours is never touched.
+        let c = base("other");
+        std::fs::create_dir_all(c.join("Blocco/something")).unwrap();
+        assert_eq!(data_root(&c), c.join("Agate"));
+        assert!(c.join("Blocco/something").is_dir());
+        let _ = (std::fs::remove_dir_all(b), std::fs::remove_dir_all(c));
+    }
+
+    #[cfg(windows)]
+    #[test]
+    fn locked_blocco_folder_is_used_in_place() {
+        use std::os::windows::fs::OpenOptionsExt;
+        let b = base("locked");
+        std::fs::create_dir_all(b.join("Blocco/instances")).unwrap();
+        std::fs::write(b.join("Blocco/profiles.json"), "[]").unwrap();
+        // An open file without delete sharing blocks renaming its folder, like a running game.
+        let lock = std::fs::OpenOptions::new().read(true).share_mode(0).open(b.join("Blocco/profiles.json")).unwrap();
+        assert_eq!(data_root(&b), b.join("Blocco"));
+        drop(lock);
+        assert_eq!(data_root(&b), b.join("Agate"));
+        let _ = std::fs::remove_dir_all(b);
     }
 }

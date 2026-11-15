@@ -489,7 +489,7 @@ mod tests {
 
     #[test]
     fn resource_packs_and_shaders_round_trip() {
-        let root = std::env::temp_dir().join(format!("blocco-test-{}", std::process::id()));
+        let root = std::env::temp_dir().join(format!("agate-test-{}", std::process::id()));
         let paths = Paths { root: root.clone() };
         let p = profile("1.20.1", "fabric");
         std::fs::create_dir_all(paths.instance("t")).unwrap();

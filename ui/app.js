@@ -27,10 +27,10 @@ const esc = escHtml;
 const icon = (name, cls = "") => `<svg class="${cls}" aria-hidden="true"><use href="#i-${name}"/></svg>`;
 /** A "?" that shows `text` on hover or keyboard focus. */
 const tip = (text, cls = "") => `<span class="tip ${cls}" tabindex="0" role="note" aria-label="${esc(text)}" data-tip="${esc(text)}">${icon("help")}</span>`;
-/** Image URL for a file inside the data folder, served by the app's `blocco://` protocol. */
+/** Image URL for a file inside the data folder, served by the app's `agate://` protocol. */
 const fileUrl = (p) => {
   const rel = p.startsWith(S.dataDir) ? p.slice(S.dataDir.length).replace(/^[\\/]+/, "") : p;
-  return `http://blocco.localhost/${rel.split(/[\\/]/).map(encodeURIComponent).join("/")}`;
+  return `http://agate.localhost/${rel.split(/[\\/]/).map(encodeURIComponent).join("/")}`;
 };
 const fmtMem = (mb) => (mb >= 1024 ? `${+(mb / 1024).toFixed(1)} GB` : `${mb} MB`);
 const fmtNum = (n) => (n >= 1e6 ? `${(n / 1e6).toFixed(1)} M` : n >= 1e3 ? `${Math.round(n / 1e3)} k` : `${n}`);
@@ -654,11 +654,11 @@ function importPanel() {
       return `<label class="item import-row ${f.supported ? "" : "off"}" ${stagger(i)}>
         <input type="checkbox" class="check" data-pick="${i}" ${im.selected.has(i) ? "checked" : ""} ${f.supported && !im.running ? "" : "disabled"} aria-label="${esc(f.name)}">
         <div style="min-width:0"><div class="item-title">${esc(f.name)}</div><div class="meta">${esc(facts)}</div></div>
-        <div class="actions">${right}${f.supported ? "" : tip(tp("Blocco avvia solo profili Vanilla e Fabric."))}</div>
+        <div class="actions">${right}${f.supported ? "" : tip(tp("Agate avvia solo profili Vanilla e Fabric."))}</div>
       </label>`;
     }).join("")}</div></section>`;
   }).join("");
-  return `<p class="lead">${t("Scegli i profili da copiare in Blocco: mondi, mod, texture pack, shader e impostazioni. Gli originali non vengono toccati.")}</p>
+  return `<p class="lead">${t("Scegli i profili da copiare in Agate: mondi, mod, texture pack, shader e impostazioni. Gli originali non vengono toccati.")}</p>
     ${groups}
     <div class="row import-foot">
       <button class="btn primary" id="import-go" ${n && !im.running ? "" : "disabled"}>${im.running ? icon("down", "spin") : icon("down")}${t("Importa {n}", { n: n || "" })}</button>
@@ -953,11 +953,11 @@ async function mountSettingsArt() {
   paintCustomCape();
 }
 
-/* ----- custom cape (shown only to you, by the Blocco Cape mod on Fabric 26.x) ----- */
+/* ----- custom cape (shown only to you, by the Agate Cape mod on Fabric 26.x) ----- */
 
 function customCapeHtml() {
   const e = S.capeEdit;
-  const head = `<div class="row"><h4>${t("Mantello personalizzato")}</h4>${tip(tp("Un mantello tuo, che vedi solo tu in gioco. Funziona nei profili Fabric 26.x: il launcher aggiunge da solo la mod Blocco Cape."))}</div>`;
+  const head = `<div class="row"><h4>${t("Mantello personalizzato")}</h4>${tip(tp("Un mantello tuo, che vedi solo tu in gioco. Funziona nei profili Fabric 26.x: il launcher aggiunge da solo la mod Agate Cape."))}</div>`;
   const picker = (label, cls = "btn sm") => `<label class="${cls}">${icon("upload")}${t(label)}<input type="file" accept="image/png,image/jpeg" id="cape-file" hidden></label>`;
   if (e) {
     return `${head}
@@ -1322,7 +1322,7 @@ $("#brand-mark").innerHTML = Art.logo("brand-logo");
 
 function updateRow() {
   const u = S.update || {};
-  const label = t("Blocco {v}", { v: S.version || "" });
+  const label = t("Agate {v}", { v: S.version || "" });
   let control;
   if (u.state === "available") {
     control = `<button class="btn primary" data-color="grass" id="update-go">${icon("down")}${t("Aggiorna a {v}", { v: u.version })}</button>`;
@@ -1333,7 +1333,7 @@ function updateRow() {
       : u.state === "error" ? `<span class="meta" title="${esc(u.error || "")}">${t("Controllo non riuscito")}</span>` : "";
     control = `${status}<button class="btn" id="update-check" ${u.state === "checking" ? "disabled" : ""}>${u.state === "checking" ? icon("down", "spin") : ""}${t(u.state === "checking" ? "Controllo…" : "Controlla aggiornamenti")}</button>`;
   }
-  const help = u.state === "available" && u.notes ? u.notes : tp("Blocco controlla da solo all'avvio. L'aggiornamento si installa e l'app si riapre: profili e mondi restano dove sono.");
+  const help = u.state === "available" && u.notes ? u.notes : tp("Agate controlla da solo all'avvio. L'aggiornamento si installa e l'app si riapre: profili e mondi restano dove sono.");
   return pref(label, `<div class="row">${control}</div>`, help);
 }
 
@@ -1347,7 +1347,7 @@ function paintUpdate() {
   chip.innerHTML = u.state === "installing"
     ? `${icon("down", "spin")}${u.pct == null ? t("Installo…") : `${u.pct}%`}`
     : `<span class="update-dot"></span>${t("Aggiorna")}`;
-  chip.title = u.state === "available" ? tp("Installa Blocco {v}: l'app si riapre da sola.", { v: u.version }) : "";
+  chip.title = u.state === "available" ? tp("Installa Agate {v}: l'app si riapre da sola.", { v: u.version }) : "";
 }
 
 async function checkUpdate(quiet) {

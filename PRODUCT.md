@@ -38,7 +38,7 @@ Used on a desktop PC, often in the evening, right before playing. Sessions are s
 
 ## Brand Commitments
 
-Name: undecided; working name "Blocco". User asked for clean, minimal, fast; Modrinth App as reference for structure.
+Name: Agate (called Blocco until 0.2.0). User asked for clean, minimal, fast; Modrinth App as reference for structure.
 
 ## Product Principles
 

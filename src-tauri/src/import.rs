@@ -1,6 +1,6 @@
 //! Import instances from other launchers (Modrinth App, CurseForge, Prism Launcher).
-//! Nothing is moved: the game folder is copied into a new Blocco profile, the original
-//! stays untouched. Only Vanilla and Fabric instances can be imported (what Blocco runs).
+//! Nothing is moved: the game folder is copied into a new Agate profile, the original
+//! stays untouched. Only Vanilla and Fabric instances can be imported (what Agate runs).
 
 use crate::app::Paths;
 use crate::profiles::{self, Profile};
@@ -14,7 +14,7 @@ pub struct Found {
     pub source: String,
     pub name: String,
     pub mc: String,
-    /// "vanilla" | "fabric" | another loader Blocco cannot run (forge, neoforge, quilt…)
+    /// "vanilla" | "fabric" | another loader Agate cannot run (forge, neoforge, quilt…)
     pub loader: String,
     pub loader_version: Option<String>,
     /// The instance's game folder (saves, mods, options.txt…).
@@ -150,7 +150,7 @@ pub fn scan() -> Vec<Found> {
 
 /* ---------- copy ---------- */
 
-/// Launcher bookkeeping and caches that a Blocco profile does not need.
+/// Launcher bookkeeping and caches that a Agate profile does not need.
 const SKIP: &[&str] = &[
     "logs", "crash-reports", ".fabric", ".cache", "cache", "natives", "bin", "downloads", ".mixin.out",
     "minecraftinstance.json", "instance.cfg", "mmc-pack.json", "profile.json", "usercache.json", "usernamecache.json",
@@ -182,7 +182,7 @@ fn copy_dir(from: &Path, to: &Path, top: bool) -> Result<()> {
 pub fn import(paths: &Paths, path: &str, color: &str, icon: &str) -> Result<Profile> {
     let f = scan().into_iter().find(|f| f.path == path).ok_or_else(|| anyhow!("Instance not found"))?;
     if !f.supported {
-        bail!("{}: Blocco runs Vanilla and Fabric only", f.name);
+        bail!("{}: Agate runs Vanilla and Fabric only", f.name);
     }
     let settings = profiles::settings(paths);
     let id = uuid::Uuid::new_v4().simple().to_string()[..12].to_string();
@@ -218,7 +218,7 @@ mod tests {
 
     #[test]
     fn prism_instance_is_read() {
-        let dir = std::env::temp_dir().join(format!("blocco-prism-{}", std::process::id()));
+        let dir = std::env::temp_dir().join(format!("agate-prism-{}", std::process::id()));
         std::fs::create_dir_all(dir.join(".minecraft/saves/World 1")).unwrap();
         std::fs::create_dir_all(dir.join(".minecraft/mods")).unwrap();
         std::fs::write(dir.join(".minecraft/mods/sodium.jar"), b"").unwrap();

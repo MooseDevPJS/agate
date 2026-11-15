@@ -1,5 +1,5 @@
 //! Self-update from the GitHub releases (tauri-plugin-updater). Every installer is
-//! signed with the release key; the public half lives in tauri.conf.json, so Blocco
+//! signed with the release key; the public half lives in tauri.conf.json, so Agate
 //! only ever installs builds that were signed by that key.
 
 use serde::Serialize;
@@ -30,7 +30,7 @@ pub async fn check(app: &AppHandle) -> anyhow::Result<Option<Available>> {
 }
 
 /// Downloads the pending update (emitting `update-progress`), then runs its installer.
-/// On Windows the installer replaces Blocco and starts it again, so this does not return on success.
+/// On Windows the installer replaces Agate and starts it again, so this does not return on success.
 pub async fn install(app: &AppHandle) -> anyhow::Result<()> {
     let pending = PENDING.lock().unwrap().take();
     let update = match pending {

@@ -1,5 +1,5 @@
 //! The custom cape: an image of the player's choosing, shown only to them in game by the
-//! bundled "Blocco Cape" Fabric mod (Minecraft 26.x). Nothing is sent to Mojang.
+//! bundled "Agate Cape" Fabric mod (Minecraft 26.x). Nothing is sent to Mojang.
 
 use crate::app::Paths;
 use crate::profiles::Profile;
@@ -7,8 +7,11 @@ use anyhow::{bail, Result};
 use std::path::PathBuf;
 
 /// The mod, built from `cape-mod/` with `cape-mod/build.sh`.
-const MOD_JAR: &[u8] = include_bytes!("../assets/blocco-cape.jar");
-const MOD_FILE: &str = "blocco-cape.jar";
+const MOD_JAR: &[u8] = include_bytes!("../assets/agate-cape.jar");
+const MOD_FILE: &str = "agate-cape.jar";
+/// What the mod and its picture were called before the app became Agate: removed from profiles.
+const LEGACY_FILE: &str = "blocco-cape.jar";
+const LEGACY_CONFIG: &str = "blocco";
 
 pub fn image(paths: &Paths) -> PathBuf {
     paths.shared().join("cape.png")
@@ -77,15 +80,17 @@ pub fn remove(paths: &Paths) -> Result<()> {
 }
 
 pub fn is_mod_file(name: &str) -> bool {
-    name == MOD_FILE || name == format!("{MOD_FILE}.disabled")
+    [MOD_FILE, LEGACY_FILE].iter().any(|f| name == *f || name == format!("{f}.disabled"))
 }
 
 /// Before launch: install the mod and the image into the profile, or take both away.
 pub fn apply(paths: &Paths, p: &Profile, enabled: bool) -> Result<()> {
     let dir = paths.instance(&p.id);
     let jar = dir.join("mods").join(MOD_FILE);
-    let target = dir.join("config").join("blocco").join("cape.png");
+    let target = dir.join("config").join("agate").join("cape.png");
     let source = image(paths);
+    let _ = std::fs::remove_file(dir.join("mods").join(LEGACY_FILE));
+    let _ = std::fs::remove_dir_all(dir.join("config").join(LEGACY_CONFIG));
     if enabled && supported(p) && source.exists() {
         std::fs::create_dir_all(dir.join("mods"))?;
         if std::fs::read(&jar).map_or(true, |b| b != MOD_JAR) {

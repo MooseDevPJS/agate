@@ -1,13 +1,13 @@
 {
   "schemaVersion": 1,
-  "id": "blocco-cape",
+  "id": "agate-cape",
   "version": "1.0.0",
-  "name": "Blocco Cape",
-  "description": "Shows the custom cape chosen in the Blocco launcher. Only you can see it.",
+  "name": "Agate Cape",
+  "description": "Shows the custom cape chosen in the Agate launcher. Only you can see it.",
   "environment": "client",
   "depends": {
     "fabricloader": ">=0.16.0",
     "minecraft": ">=26.1- <27"
   },
-  "mixins": ["blocco-cape.mixins.json"]
+  "mixins": ["agate-cape.mixins.json"]
 }

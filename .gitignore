@@ -4,9 +4,8 @@
 /.tools/
 /cape-mod/build/
 
-# Review screenshots (they show the local account and worlds)
-/.impeccable/review/
+# Impeccable design-tool workspace: local only
+/.impeccable/
 
 # Never commit signing keys
 *.key
-/.impeccable/questions/

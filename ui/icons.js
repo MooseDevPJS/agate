@@ -1,5 +1,5 @@
 "use strict";
-/* Blocco's own art: the logo (a little grass block with eyes) and the profile icons
+/* Agate's own art: the logo (the Agate mark) and the profile icons
    (16×16 pixel art, tinted with the profile colour). All SVG, crisp at any size. */
 
 const Art = (() => {
@@ -220,30 +220,11 @@ const Art = (() => {
     return `<svg class="picon ${cls}" viewBox="0 0 16 16" shape-rendering="crispEdges" ${color ? `data-color="${color}"` : ""} aria-hidden="true">${body}</svg>`;
   }
 
-  /** The Blocco mascot: an isometric grass block with a face. Vector, so it scales cleanly. */
-  function logo(cls = "", { badge = false } = {}) {
-    const block = `
-      <g class="logo-block">
-        <path d="M32 7 55 19 32 31 9 19Z" fill="#7cc34f"/>
-        <path d="M32 9.6 51 19 32 28.4 13 19Z" fill="#8fd25f"/>
-        <path d="M9 19 32 31v26L9 45Z" fill="#9a6438"/>
-        <path d="M55 19 32 31v26l23-12Z" fill="#74482a"/>
-        <path d="M9 19 32 31v6.2l-3.2-1.6v3.4l-3.6-1.9v-2.6l-4-2.1v4.2l-3.6-1.9v-3.9L14 28v2.4l-5-2.6Z" fill="#62a83c"/>
-        <path d="M55 19 32 31v6.2l3.4-1.7v2.7l4-2v-3.3l3.6-1.8v3.6l4-2v-3.8l3.4-1.7v2.2l4.6-2.3Z" fill="#4f8d30"/>
-        <path d="M32 31v26" stroke="#5b391f" stroke-width=".8" opacity=".55"/>
-        <g class="logo-eyes">
-          <path d="M15.6 36.4l3.2 1.6v5.2l-3.2-1.6Z" fill="#1d1612"/>
-          <path d="M23.4 40.3l3.2 1.6v5.2l-3.2-1.6Z" fill="#1d1612"/>
-          <path d="M16.3 37.4l1 .5v1.4l-1-.5Z" fill="#fff6e0"/>
-          <path d="M24.1 41.3l1 .5v1.4l-1-.5Z" fill="#fff6e0"/>
-        </g>
-        <path d="M18.6 46.6q2.6 2.4 5.2 2.6" stroke="#1d1612" stroke-width="1.1" fill="none" stroke-linecap="round"/>
-      </g>`;
-    if (!badge) return `<svg class="logo ${cls}" viewBox="0 0 64 64" aria-hidden="true">${block}</svg>`;
-    return `<svg class="logo ${cls}" viewBox="0 0 64 64" aria-hidden="true">
-      <rect width="64" height="64" rx="15" fill="#141311"/>
-      <rect x=".75" y=".75" width="62.5" height="62.5" rx="14.25" fill="none" stroke="#2b2825" stroke-width="1.5"/>
-      <g transform="translate(5.6 4.6) scale(.825)">${block}</g>
+  /** The Agate mark: the A with a block under its arch (brand/agate-mark.svg), in the text colour. */
+  function logo(cls = "") {
+    return `<svg class="logo ${cls}" viewBox="0 0 760 552" aria-hidden="true" fill="currentColor">
+      <path d="M0 550 332.5 0 427.5 0 552.1 206 450.8 280 380 162.9 146 550ZM470.1 312 571.4 238 760 550 614 550Z"/>
+      <g class="logo-cube"><path d="M287 367 380 313.5 473 367 380 420.5ZM276 400 366 452 366 552 276 500ZM394 452 484 400 484 500 394 552Z"/></g>
     </svg>`;
   }
 
